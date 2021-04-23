@@ -19,7 +19,7 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<groupId>wiki-edits</groupId>
 	<artifactId>wiki-edits</artifactId>
 	<version>0.1</version>
@@ -46,9 +46,9 @@ under the License.
 			</snapshots>
 		</repository>
 	</repositories>
-	
-	<!-- 
-		
+
+	<!--
+
 		Execute "mvn clean package -Pbuild-jar"
 		to build a jar file out of this project!
 
@@ -85,6 +85,11 @@ under the License.
 		<dependency>
 			<groupId>org.apache.flink</groupId>
 			<artifactId>flink-clients_2.10</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-wikiedits_2.10</artifactId>
 			<version>${flink.version}</version>
 		</dependency>
 	</dependencies>
@@ -278,8 +283,8 @@ under the License.
 				</configuration>
 			</plugin>
 		</plugins>
-		
-			
+
+
 		<!-- If you want to use Java 8 Lambda Expressions uncomment the following lines -->
 		<!--
 		<pluginManagement>
@@ -299,7 +304,7 @@ under the License.
 						</dependency>
 					</dependencies>
 				</plugin>
-		
+
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -341,6 +346,6 @@ under the License.
 			</plugins>
 		</pluginManagement>
 		-->
-		
+
 	</build>
 </project>
