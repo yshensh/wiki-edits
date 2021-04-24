@@ -28,9 +28,13 @@ flink-1.12.2-bin-scala_2.11.tgz
 kafka_2.13-2.8.0.tgz
 ```
 
-Step 1: Start the Kafka Environment
+Step 1: Start Flink and the Kafka Environment
+Start Flink
+```
+bin/start-cluster.sh
+```
 
-Run the following commands in order to start all services in the correct order:
+Run the following commands in order to start all Kafka services in the correct order:
 ```
 #  Start the ZooKeeper service
 bin/zookeeper-server-start.sh config/zookeeper.properties
