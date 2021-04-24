@@ -3,8 +3,7 @@
 ## Overview
 Toy project that runs a streaming analysis program on a Flink cluster and writes output to Kafka topic.
 
-All implementations follow the tututorial(
-[Monitoring the Wikipedia Edit Stream](https://ci.apache.org/projects/flink/flink-docs-release-1.0/quickstart/run_example_quickstart.html)) with slight updates on using the more recently published libriraries. 
+All implementations follow the tututorial ([Monitoring the Wikipedia Edit Stream](https://ci.apache.org/projects/flink/flink-docs-release-1.0/quickstart/run_example_quickstart.html)) with slight updates on using the more recently published libriraries. 
 
 ## Build and Run
 Build JAR file
