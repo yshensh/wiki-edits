@@ -92,6 +92,11 @@ under the License.
 			<artifactId>flink-connector-wikiedits_2.10</artifactId>
 			<version>${flink.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.flink</groupId>
+			<artifactId>flink-connector-kafka-0.8_2.10</artifactId>
+			<version>${flink.version}</version>
+		</dependency>
 	</dependencies>
 
 	<profiles>
