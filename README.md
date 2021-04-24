@@ -29,7 +29,8 @@ kafka_2.13-2.8.0.tgz
 ```
 
 Step 1: Start Flink and the Kafka Environment
-Start Flink
+
+Start Flink and check the JobManager’s web frontend at [http://localhost:8081](http://localhost:8081)
 ```
 bin/start-cluster.sh
 ```
