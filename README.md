@@ -81,3 +81,4 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic wiki-res
 
 [setup quickstart for Flink distribution](https://ci.apache.org/projects/flink/flink-docs-release-1.0/quickstart/run_example_quickstart.html)
 
+[Flink proeject configuration](https://ci.apache.org/projects/flink/flink-docs-stable/dev/project-configuration.html)
