@@ -1,19 +1,23 @@
 package wikiedits;
 
-import org.apache.flink.api.common.functions.FoldFunction;
+import org.apache.flink.api.common.functions.AggregateFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.KeyedStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer08;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditEvent;
 import org.apache.flink.streaming.connectors.wikiedits.WikipediaEditsSource;
-import org.apache.flink.streaming.util.serialization.SimpleStringSchema;
+
+import java.util.Properties;
 
 public class WikipediaAnalysis {
+
     public static void main(String[] args) throws Exception {
         // set execution parameters
         StreamExecutionEnvironment see = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -25,35 +29,59 @@ public class WikipediaAnalysis {
         KeyedStream<WikipediaEditEvent, String> keyedEdits = edits
                 .keyBy(new KeySelector<WikipediaEditEvent, String>() {
                     @Override
-                    public String getKey(WikipediaEditEvent event){
+                    public String getKey(WikipediaEditEvent event) {
                         return event.getUser();
                     }
                 });
 
         // aggregate the sum of edited bytes for every five seconds
         DataStream<Tuple2<String, Long>> result = keyedEdits
-                .timeWindow(Time.seconds(5))
-                .fold(new Tuple2<>("", 0L), new FoldFunction<WikipediaEditEvent, Tuple2<String, Long>>() {
+                .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
+                .aggregate(new AggregateFunction<WikipediaEditEvent, Tuple2<String, Long>, Tuple2<String, Long>>() {
                     @Override
-                    public Tuple2<String, Long> fold(Tuple2<String, Long> acc, WikipediaEditEvent event) {
-                        acc.f0 = event.getUser();
-                        acc.f1 += event.getByteDiff();
-                        return acc;
+                    public Tuple2<String, Long> createAccumulator() {
+                        return new Tuple2<>("", 0L);
+                    }
+
+                    @Override
+                    public Tuple2<String, Long> add(WikipediaEditEvent event, Tuple2<String, Long> accumulator) {
+                        accumulator.f0 = event.getUser();
+                        accumulator.f1 += event.getByteDiff();
+                        return accumulator;
+                    }
+
+                    @Override
+                    public Tuple2<String, Long> getResult(Tuple2<String, Long> accumulator) {
+                        return accumulator;
+                    }
+
+                    @Override
+                    public Tuple2<String, Long> merge(Tuple2<String, Long> cur, Tuple2<String, Long> accumulator) {
+                        return new Tuple2<>(cur.f0, cur.f1 + accumulator.f1);
                     }
                 });
 
-        // print the stream to the console and start execution
-        // result.print();
 
-        // write to Kafka sink
+        // configuration for Kafka sink
+        Properties properties = new Properties();
+        properties.setProperty("bootstrap.servers", "localhost:9092");
+        FlinkKafkaProducer<String> kafkaProducer = new FlinkKafkaProducer<>(
+                "wiki-result",       // target topic
+                new SimpleStringSchema(),   // serialization schema
+                properties                  // producer config
+        );
+
+        // write to Kafka
         result.map(new MapFunction<Tuple2<String, Long>, String>() {
             @Override
             public String map(Tuple2<String, Long> tuple) {
                 return tuple.toString();
             }
-        }).addSink(new FlinkKafkaProducer08<>("localhost:9092", "wiki-result", new SimpleStringSchema()));
+        }).addSink(kafkaProducer);
 
-        // start the Flink job
+        // print the stream to the console and start execution
+        //result.print();
+
         see.execute();
     }
 }
